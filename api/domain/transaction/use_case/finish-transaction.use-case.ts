@@ -74,7 +74,7 @@ export class FinishTransactionUseCase {
       this.logger.log('Updating Product Stock', { request: request });
       await this.productsRepository.updateStock(
         transaction.product.id,
-        transaction.quantity,
+        transaction.product.stock - transaction.quantity,
       );
     }
     this.logger.log('Updating Transaction Status', { request: request });
