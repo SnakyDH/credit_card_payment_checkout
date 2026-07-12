@@ -17,14 +17,31 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "migration:generate": "npx typeorm-ts-node-commonjs -d src/config/postgres.data-source.ts migration:generate src/db/",
+    "migration:run": "npx typeorm-ts-node-commonjs -d src/config/postgres.data-source.ts migration:run -- -d src/config/postgres.data-source.ts",
+    "migration:revert": "npx typeorm-ts-node-commonjs -d src/config/postgres.data-source.ts migration:revert",
+    "seed:create": "npx typeorm-ts-node-commonjs -d src/config/postgres.data-source.ts migration:create src/db/",
+    "seed:run": "npx typeorm-ts-node-commonjs -d src/config/postgres.data-source.ts migration:run ",
+    "seed:revert": "npx typeorm-ts-node-commonjs -d src/config/postgres.data-source.ts migration:revert",
+    "seed:dev": "ts-node -r tsconfig-paths/register src/db/seed.ts"
   },
   "dependencies": {
+    "@nestjs/axios": "^4.0.1",
     "@nestjs/common": "^11.0.1",
+    "@nestjs/config": "^4.0.4",
     "@nestjs/core": "^11.0.1",
     "@nestjs/platform-express": "^11.0.1",
+    "@nestjs/swagger": "^11.4.5",
+    "@nestjs/typeorm": "^11.0.3",
+    "axios": "^1.18.1",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.15.1",
+    "pg": "^8.22.0",
     "reflect-metadata": "^0.2.2",
-    "rxjs": "^7.8.1"
+    "rxjs": "^7.8.1",
+    "swagger-ui-express": "^5.0.1",
+    "typeorm": "^1.0.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
@@ -34,7 +51,7 @@
     "@nestjs/testing": "^11.0.1",
     "@types/express": "^5.0.0",
     "@types/jest": "^30.0.0",
-    "@types/node": "^24.0.0",
+    "@types/node": "^24.13.3",
     "@types/supertest": "^7.0.0",
     "eslint": "^9.18.0",
     "eslint-config-prettier": "^10.0.1",
@@ -57,15 +74,44 @@
       "json",
       "ts"
     ],
-    "rootDir": "src",
+    "rootDir": ".",
+    "roots": [
+      "<rootDir>/src",
+      "<rootDir>/domain"
+    ],
     "testRegex": ".*\\.spec\\.ts$",
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
     },
+    "moduleNameMapper": {
+      "^@domain/(.*)$": "<rootDir>/domain/$1",
+      "^domain/(.*)$": "<rootDir>/domain/$1",
+      "^@config/(.*)$": "<rootDir>/src/config/$1",
+      "^@adapter/(.*)$": "<rootDir>/src/adapter/$1"
+    },
     "collectCoverageFrom": [
-      "**/*.(t|j)s"
+      "src/**/*.(t|j)s",
+      "domain/**/*.(t|j)s"
     ],
-    "coverageDirectory": "../coverage",
+    "coveragePathIgnorePatterns": [
+      "<rootDir>/domain/shared/logger/",
+      "<rootDir>/src/adapter/in/controllers/",
+      "<rootDir>/src/adapter/in/dtos/request/",
+      "<rootDir>/src/adapter/in/dtos/response/",
+      "<rootDir>/src/adapter/out/wompi/dtos/",
+      "<rootDir>/src/config/",
+      "<rootDir>/src/db/",
+      "<rootDir>/src/modules/",
+      "<rootDir>/domain/transaction/model/",
+      "<rootDir>/domain/presigned/model/",
+      "<rootDir>/domain/delivery/model/",
+      "<rootDir>/domain/products/model/",
+      "<rootDir>/domain/transaction/model/",
+      "<rootDir>/domain/transaction/enums/",
+      "<rootDir>/src/app.module.ts",
+      "<rootDir>/src/main.ts"
+    ],
+    "coverageDirectory": "./coverage",
     "testEnvironment": "node"
   }
 }
