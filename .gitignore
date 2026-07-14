@@ -1,3 +1,6 @@
 # Ignore all files in the .git directory
 .vscode
 .env
+
+# Local Android release binaries (exceed GitHub 100 MB limit)
+builds/*.apk
