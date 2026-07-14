@@ -17,6 +17,7 @@ import { HttpService } from '@nestjs/axios';
 import { AxiosRequestConfig } from 'axios';
 import { firstValueFrom } from 'rxjs';
 import { LoggerService } from '@config/logger.service';
+import { ExceptionWithStatus } from '@domain/shared/exceptions/exception-with-status';
 import { GatewayErrorMapper } from '../mappers/gateway-error.mapper';
 
 export class PaymentGatewayRepository implements IPaymentGatewayRepository {
@@ -30,6 +31,13 @@ export class PaymentGatewayRepository implements IPaymentGatewayRepository {
     paymentCard: PaymentCard,
   ): Promise<PaymentResult> {
     this.logger.log('Paying Transaction', { transaction, paymentCard });
+    const amountInCents = Math.round(transaction.total! * 100);
+    if (!Number.isInteger(amountInCents) || amountInCents <= 0) {
+      throw new ExceptionWithStatus(
+        422,
+        'El monto del pago no es válido. Verifica tu pedido e intenta de nuevo.',
+      );
+    }
     const tokenizedCard = await this.tokenizeCard({
       number: paymentCard.number,
       cvc: paymentCard.cvv,
@@ -38,7 +46,6 @@ export class PaymentGatewayRepository implements IPaymentGatewayRepository {
       card_holder: paymentCard.holderName,
     });
     this.logger.log('Tokenized card', { tokenizedCard });
-    const amountInCents = transaction.total! * 100;
     const signature = `${this.projectKey}-${transaction.id}${amountInCents}COP${envConstants.paymentGateway.integrityKey}`;
     const encryptedSignature = crypto
       .createHash('sha256')
@@ -82,7 +89,7 @@ export class PaymentGatewayRepository implements IPaymentGatewayRepository {
         status: GatewayStatusMapper.map(creationResult.data.status),
       };
     }
-    let retries = 5;
+    let retries = 1;
     let transactionStatus = GatewayTransactionStatus.PENDING;
     while (
       retries > 0 &&

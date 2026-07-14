@@ -8,7 +8,7 @@ import { PresignedType } from '../../presigned/model/presigned.type';
 import { Product } from '../../products/model/product.model';
 import { ExceptionCustom } from '@domain/shared/exceptions/exception-custom';
 import { LoggerService } from '@config/logger.service';
-import { FormatCurrency } from '@domain/shared/format/format_currency';
+import { FormatCurrency } from '@domain/shared/formatters/format-currency';
 
 export interface InitTransactionRequest {
   productId: number;
@@ -38,7 +38,7 @@ export class InitTransactionUseCase {
       throw new ExceptionCustom(ExceptionConstants.PRODUCT_NOT_FOUND);
     }
     this.logger.log('Calculating total', { request: request });
-    const total = FormatCurrency.format(product.price * request.quantity);
+    const total = product.price * request.quantity;
 
     this.logger.log('Total calculated', { total });
     const transactionData: Omit<
@@ -60,8 +60,12 @@ export class InitTransactionUseCase {
     const transaction =
       await this.transactionRepository.create(transactionData);
     this.logger.log('Transaction created', { transaction });
+    const transactionFormatted = {
+      ...transaction,
+      total: FormatCurrency.formatToUser(transaction.total!),
+    };
     return {
-      transaction,
+      transaction: transactionFormatted,
       presignedDocuments: request.presignedDocuments,
     };
   }

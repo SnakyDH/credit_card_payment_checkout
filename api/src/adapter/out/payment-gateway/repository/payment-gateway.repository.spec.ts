@@ -195,7 +195,9 @@ describe('PaymentGatewayRepository', () => {
         throwError(() => createAxiosError(422, 'Duplicate reference')),
       );
 
-    await expect(repository.pay(transaction, paymentCard)).rejects.toMatchObject({
+    await expect(
+      repository.pay(transaction, paymentCard),
+    ).rejects.toMatchObject({
       statusCode: 422,
       message:
         'Ya procesamos esta compra. Inicia una nueva transacción para continuar.',
@@ -207,7 +209,9 @@ describe('PaymentGatewayRepository', () => {
       throwError(() => createAxiosError(400, 'Incomplete payment method')),
     );
 
-    await expect(repository.pay(transaction, paymentCard)).rejects.toMatchObject({
+    await expect(
+      repository.pay(transaction, paymentCard),
+    ).rejects.toMatchObject({
       statusCode: 400,
       message:
         'Faltan datos de la tarjeta. Revisa la información e intenta de nuevo.',

@@ -5,7 +5,7 @@ import { ProductFilter } from '@domain/products/model/product-filter.model';
 import { Product } from '@domain/products/model/product.model';
 import { ExceptionConstants } from '@domain/shared/exceptions/exception-constants';
 import { LoggerService } from '@config/logger.service';
-import { FormatCurrency } from '@domain/shared/format/format_currency';
+import { FormatCurrency } from '@domain/shared/formatters/format-currency';
 
 export class GetProductsUseCase {
   private readonly logger = new LoggerService(GetProductsUseCase.name);
@@ -29,7 +29,7 @@ export class GetProductsUseCase {
       }
 
       productsPaginated.items.forEach((product) => {
-        product.price = FormatCurrency.format(product.price);
+        product.price = FormatCurrency.formatToUser(product.price);
       });
 
       this.logger.log('Products formatted', { productsPaginated });

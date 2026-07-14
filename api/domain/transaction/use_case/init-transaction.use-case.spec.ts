@@ -74,7 +74,10 @@ describe('InitTransactionUseCase', () => {
       acceptanceEndUserPolicy: presignedDocuments[0],
       acceptancePersonalDataAuthorization: presignedDocuments[1],
     });
-    expect(result.transaction).toBe(createdTransaction);
+    expect(result.transaction).toEqual({
+      ...createdTransaction,
+      total: 30,
+    });
     expect(result.presignedDocuments).toBe(presignedDocuments);
   });
 

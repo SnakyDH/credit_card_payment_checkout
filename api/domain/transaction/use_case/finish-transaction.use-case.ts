@@ -9,6 +9,7 @@ import { TransactionStatus } from '../enums/transaction-status.enum';
 import { PaymentCard } from '../model/credit-card.model';
 import { Delivery } from '@domain/delivery/model/delivery';
 import { LoggerService } from '@config/logger.service';
+import { FormatCurrency } from '@domain/shared/formatters/format-currency';
 
 export interface FinishTransactionRequest {
   transactionId: number;
@@ -86,8 +87,12 @@ export class FinishTransactionUseCase {
       throw new ExceptionCustom(ExceptionConstants.TRANSACTION_REJECTED);
     }
     this.logger.log('Transaction finished', { request: request });
+    const transactionFormatted = {
+      ...transaction,
+      total: FormatCurrency.formatToUser(transaction.total!),
+    };
     return {
-      transaction,
+      transaction: transactionFormatted,
     };
   }
 }
