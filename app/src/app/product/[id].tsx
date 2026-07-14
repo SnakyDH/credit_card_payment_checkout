@@ -42,6 +42,7 @@ export default function ProductDetailScreen() {
   const total = coffee.price * quantity;
   const canDecrease = quantity > 1;
   const canIncrease = quantity < coffee.stockAvailable;
+  const canPurchase = coffee.stockAvailable > 0;
 
   return (
     <ThemedView style={styles.container}>
@@ -117,11 +118,14 @@ export default function ProductDetailScreen() {
         ]}
       >
         <Pressable
-          style={styles.actionButton}
-          onPress={() => setSheetVisible(true)}
+          style={[styles.actionButton, !canPurchase && styles.actionButtonDisabled]}
+          onPress={() => canPurchase && setSheetVisible(true)}
+          disabled={!canPurchase}
         >
           <ThemedText type="default" style={styles.actionButtonText}>
-            Comprar · {CurrencyFormatter.format(total)}
+            {canPurchase
+              ? `Comprar · ${CurrencyFormatter.format(total)}`
+              : "Agotado"}
           </ThemedText>
         </Pressable>
       </View>
@@ -248,6 +252,9 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.three,
     borderRadius: Spacing.four,
     alignItems: "center",
+  },
+  actionButtonDisabled: {
+    opacity: 0.4,
   },
   actionButtonText: {
     color: CoffeePalette.warmWhite,
