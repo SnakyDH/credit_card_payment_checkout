@@ -89,7 +89,7 @@ export class PaymentGatewayRepository implements IPaymentGatewayRepository {
         status: GatewayStatusMapper.map(creationResult.data.status),
       };
     }
-    let retries = 1;
+    let retries = 5;
     let transactionStatus = GatewayTransactionStatus.PENDING;
     while (
       retries > 0 &&
