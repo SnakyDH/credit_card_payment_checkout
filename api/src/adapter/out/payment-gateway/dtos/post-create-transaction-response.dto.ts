@@ -24,7 +24,7 @@ export class PostCreateTransactionResponseDto {
       };
       installments: number;
     };
-    status: WompiTransactionStatus;
+    status: GatewayTransactionStatus;
     status_message: string | null;
     billing_data: any | null;
     shipping_address: {
@@ -48,7 +48,7 @@ export class PostCreateTransactionResponseDto {
   meta: any;
 }
 
-export enum WompiTransactionStatus {
+export enum GatewayTransactionStatus {
   PENDING = 'PENDING',
   APPROVED = 'APPROVED',
   DECLINED = 'DECLINED',

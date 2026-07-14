@@ -1,16 +1,17 @@
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { HttpService } from '@nestjs/axios';
-import { AxiosResponse } from 'axios';
+import { AxiosError, AxiosHeaders, AxiosResponse } from 'axios';
+import { ExceptionWithStatus } from '@domain/shared/exceptions/exception-with-status';
 import { Product } from '@domain/products/model/product.model';
 import { TransactionStatus } from '@domain/transaction/enums/transaction-status.enum';
 import { OrderTransaction } from '@domain/transaction/model/transaction.model';
 import { PaymentCard } from '@domain/transaction/model/credit-card.model';
-import { WompiTransactionStatus } from '../dtos/post-create-transaction-response.dto';
-import { PaymentWompiRepository } from './payment-wompi.repository';
+import { GatewayTransactionStatus } from '../dtos/post-create-transaction-response.dto';
+import { PaymentGatewayRepository } from './payment-gateway.repository';
 
 jest.mock('@config/env-constants', () => ({
   envConstants: {
-    wompi: {
+    paymentGateway: {
       privateKey: 'priv_test_key',
       integrityKey: 'integrity_test_key',
     },
@@ -25,8 +26,8 @@ const axiosResponse = <T>(data: T): AxiosResponse<T> => ({
   config: {} as AxiosResponse<T>['config'],
 });
 
-describe('PaymentWompiRepository', () => {
-  let repository: PaymentWompiRepository;
+describe('PaymentGatewayRepository', () => {
+  let repository: PaymentGatewayRepository;
   let requestMock: jest.MockedFunction<HttpService['request']>;
 
   const transaction: OrderTransaction = {
@@ -61,7 +62,7 @@ describe('PaymentWompiRepository', () => {
   beforeEach(() => {
     jest.useFakeTimers();
     requestMock = jest.fn();
-    repository = new PaymentWompiRepository({
+    repository = new PaymentGatewayRepository({
       request: requestMock,
     } as unknown as HttpService);
   });
@@ -85,7 +86,7 @@ describe('PaymentWompiRepository', () => {
           axiosResponse({
             data: {
               id: 'txn-123',
-              status: WompiTransactionStatus.APPROVED,
+              status: GatewayTransactionStatus.APPROVED,
             },
           }),
         ),
@@ -134,7 +135,7 @@ describe('PaymentWompiRepository', () => {
           axiosResponse({
             data: {
               id: 'txn-456',
-              status: WompiTransactionStatus.PENDING,
+              status: GatewayTransactionStatus.PENDING,
             },
           }),
         ),
@@ -144,7 +145,7 @@ describe('PaymentWompiRepository', () => {
           axiosResponse({
             data: {
               id: 'txn-456',
-              status: WompiTransactionStatus.APPROVED,
+              status: GatewayTransactionStatus.APPROVED,
             },
           }),
         ),
@@ -166,5 +167,69 @@ describe('PaymentWompiRepository', () => {
       id: 'txn-456',
       status: TransactionStatus.APPROVED,
     });
+  });
+
+  const createAxiosError = (status: number, reason: string): AxiosError => {
+    const error = new AxiosError('Request failed');
+    error.response = {
+      status,
+      statusText: 'Error',
+      headers: {},
+      config: { headers: new AxiosHeaders() },
+      data: { error: { reason } },
+    };
+    return error;
+  };
+
+  it('should throw mapped error when create transaction fails with duplicate reference', async () => {
+    requestMock
+      .mockReturnValueOnce(
+        of(
+          axiosResponse({
+            status: 'OK',
+            data: { id: 'card-token-1' },
+          }),
+        ),
+      )
+      .mockReturnValueOnce(
+        throwError(() => createAxiosError(422, 'Duplicate reference')),
+      );
+
+    await expect(repository.pay(transaction, paymentCard)).rejects.toMatchObject({
+      statusCode: 422,
+      message:
+        'Ya procesamos esta compra. Inicia una nueva transacción para continuar.',
+    });
+  });
+
+  it('should throw mapped error when tokenize card fails with incomplete payment method', async () => {
+    requestMock.mockReturnValueOnce(
+      throwError(() => createAxiosError(400, 'Incomplete payment method')),
+    );
+
+    await expect(repository.pay(transaction, paymentCard)).rejects.toMatchObject({
+      statusCode: 400,
+      message:
+        'Faltan datos de la tarjeta. Revisa la información e intenta de nuevo.',
+    });
+  });
+
+  it('should throw mapped error when amount is invalid before calling gateway', async () => {
+    const invalidTransaction = {
+      ...transaction,
+      total: 0,
+    };
+
+    await expect(
+      repository.pay(invalidTransaction, paymentCard),
+    ).rejects.toBeInstanceOf(ExceptionWithStatus);
+    await expect(
+      repository.pay(invalidTransaction, paymentCard),
+    ).rejects.toMatchObject({
+      statusCode: 422,
+      message:
+        'El monto del pago no es válido. Verifica tu pedido e intenta de nuevo.',
+    });
+    expect(requestMock).not.toHaveBeenCalled();
   });
 });

@@ -5,12 +5,12 @@ import { envConstants } from '@config/env-constants';
 import { GetPresignedUseCase } from '@domain/presigned/use_case/get-presigned.use-case';
 import { HttpModule, HttpService } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
-import { PresignedWompiService } from 'src/adapter/out/wompi/repository/presigned-wompi.repository';
+import { PresignedGatewayRepository } from 'src/adapter/out/payment-gateway/repository/presigned-gateway.repository';
 
 @Module({
   imports: [
     HttpModule.register({
-      baseURL: envConstants.wompi.baseUrl,
+      baseURL: envConstants.paymentGateway.baseUrl,
     }),
   ],
   controllers: [PresignedController],
@@ -18,12 +18,12 @@ import { PresignedWompiService } from 'src/adapter/out/wompi/repository/presigne
     {
       provide: 'IPresignedRepository',
       useFactory: (httpService: HttpService) =>
-        new PresignedWompiService(httpService),
+        new PresignedGatewayRepository(httpService),
       inject: [HttpService],
     },
     {
       provide: GetPresignedUseCase,
-      useFactory: (presignedRepository: PresignedWompiService) =>
+      useFactory: (presignedRepository: PresignedGatewayRepository) =>
         new GetPresignedUseCase(presignedRepository),
       inject: ['IPresignedRepository'],
     },

@@ -2,18 +2,18 @@ import { of, throwError } from 'rxjs';
 import { HttpService } from '@nestjs/axios';
 import { PresignedType } from '@domain/presigned/model/presigned.type';
 import { GetPresignedResponseDto } from '../dtos/get-presigned-response.dto';
-import { PresignedWompiService } from './presigned-wompi.repository';
+import { PresignedGatewayRepository } from './presigned-gateway.repository';
 
 jest.mock('@config/env-constants', () => ({
   envConstants: {
-    wompi: {
+    paymentGateway: {
       publicKey: 'pub_test_key',
     },
   },
 }));
 
-describe('PresignedWompiService', () => {
-  let repository: PresignedWompiService;
+describe('PresignedGatewayRepository', () => {
+  let repository: PresignedGatewayRepository;
   let requestMock: jest.MockedFunction<HttpService['request']>;
 
   const presignedResponse: GetPresignedResponseDto = {
@@ -33,12 +33,12 @@ describe('PresignedWompiService', () => {
 
   beforeEach(() => {
     requestMock = jest.fn().mockReturnValue(of({ data: presignedResponse }));
-    repository = new PresignedWompiService({
+    repository = new PresignedGatewayRepository({
       request: requestMock,
     } as unknown as HttpService);
   });
 
-  it('should fetch presigned documents from Wompi and map to domain', async () => {
+  it('should fetch presigned documents from payment gateway and map to domain', async () => {
     const result = await repository.getPresigneds();
 
     expect(requestMock).toHaveBeenCalledWith({
@@ -58,12 +58,12 @@ describe('PresignedWompiService', () => {
     });
   });
 
-  it('should throw wrapped error when Wompi request fails', async () => {
+  it('should throw wrapped error when payment gateway request fails', async () => {
     const error = new Error('network');
     requestMock.mockReturnValue(throwError(() => error));
 
     await expect(repository.getPresigneds()).rejects.toThrow(
-      'Failed to get Presigneds from Wompi',
+      'Failed to get Presigneds from payment gateway',
     );
   });
 });

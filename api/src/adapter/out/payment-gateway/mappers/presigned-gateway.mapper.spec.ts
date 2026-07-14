@@ -1,8 +1,8 @@
 import { GetPresignedResponseDto } from '../dtos/get-presigned-response.dto';
-import { PresignedWompiMapper } from './presigned-wompi.mapper';
+import { PresignedGatewayMapper } from './presigned-gateway.mapper';
 import { PresignedType } from 'domain/presigned/model/presigned.type';
 
-describe('PresignedWompiMapper', () => {
+describe('PresignedGatewayMapper', () => {
   describe('toDomainList', () => {
     it('should map GetPresignedResponseDto to Presigned array correctly', () => {
       // Arrange
@@ -22,7 +22,7 @@ describe('PresignedWompiMapper', () => {
       };
 
       // Act
-      const result = PresignedWompiMapper.toDomainList(mockPresignedResponse);
+      const result = PresignedGatewayMapper.toDomainList(mockPresignedResponse);
 
       // Assert
       expect(result).toHaveLength(2);
@@ -57,7 +57,7 @@ describe('PresignedWompiMapper', () => {
 
       // Act & Assert
       expect(() =>
-        PresignedWompiMapper.toDomainList(invalidPresignedResponse),
+        PresignedGatewayMapper.toDomainList(invalidPresignedResponse),
       ).toThrow();
     });
 
@@ -80,7 +80,7 @@ describe('PresignedWompiMapper', () => {
 
       // Act & Assert
       expect(() =>
-        PresignedWompiMapper.toDomainList(invalidTypePresignedResponse),
+        PresignedGatewayMapper.toDomainList(invalidTypePresignedResponse),
       ).toThrow();
     });
   });

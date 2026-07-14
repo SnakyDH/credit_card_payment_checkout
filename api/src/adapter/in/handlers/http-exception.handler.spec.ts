@@ -1,6 +1,8 @@
 import { ExceptionCustom } from '@domain/shared/exceptions/exception-custom';
 import { ExceptionConstants } from '@domain/shared/exceptions/exception-constants';
+import { ExceptionWithStatus } from '@domain/shared/exceptions/exception-with-status';
 import {
+  HttpException,
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common/exceptions';
@@ -11,6 +13,23 @@ describe('HttpExceptionHandler', () => {
 
   beforeEach(() => {
     handler = new HttpExceptionHandler();
+  });
+
+  it('should map ExceptionWithStatus to HttpException with status code', () => {
+    const exception = new ExceptionWithStatus(
+      422,
+      'Ya procesamos esta compra. Inicia una nueva transacción para continuar.',
+    );
+
+    const result = handler.handle(exception);
+
+    expect(result).toBeInstanceOf(HttpException);
+    expect(result.getStatus()).toBe(422);
+    expect(result.getResponse()).toMatchObject({
+      message:
+        'Ya procesamos esta compra. Inicia una nueva transacción para continuar.',
+      statusCode: 422,
+    });
   });
 
   it('should map PRODUCT_NOT_FOUND to NotFoundException', () => {

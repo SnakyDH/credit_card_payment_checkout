@@ -6,12 +6,12 @@ export const envConstants = {
     password: process.env.DB_PASSWORD,
     database: process.env.DB_DATABASE,
   },
-  wompi: {
-    baseUrl: process.env.WOMPI_API_URL,
-    publicKey: process.env.WOMPI_PUBLIC_KEY,
-    privateKey: process.env.WOMPI_PRIVATE_KEY,
-    eventsKey: process.env.WOMPI_EVENTS_KEY,
-    integrityKey: process.env.WOMPI_INTEGRITY_KEY,
+  paymentGateway: {
+    baseUrl: process.env.PAYMENT_GATEWAY_API_URL,
+    publicKey: process.env.PAYMENT_GATEWAY_PUBLIC_KEY,
+    privateKey: process.env.PAYMENT_GATEWAY_PRIVATE_KEY,
+    eventsKey: process.env.PAYMENT_GATEWAY_EVENTS_KEY,
+    integrityKey: process.env.PAYMENT_GATEWAY_INTEGRITY_KEY,
   },
   unSplash: {
     baseUrl: process.env.UNSPLASH_API_URL,

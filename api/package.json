@@ -98,7 +98,7 @@
       "<rootDir>/src/adapter/in/controllers/",
       "<rootDir>/src/adapter/in/dtos/request/",
       "<rootDir>/src/adapter/in/dtos/response/",
-      "<rootDir>/src/adapter/out/wompi/dtos/",
+      "<rootDir>/src/adapter/out/payment-gateway/dtos/",
       "<rootDir>/src/config/",
       "<rootDir>/src/db/",
       "<rootDir>/src/modules/",

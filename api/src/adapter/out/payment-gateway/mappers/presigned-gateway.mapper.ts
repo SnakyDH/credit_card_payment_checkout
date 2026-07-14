@@ -4,7 +4,7 @@ import { PresignedType } from 'domain/presigned/model/presigned.type';
 import { ExceptionConstants } from '@domain/shared/exceptions/exception-constants';
 import { ExceptionCustom } from '@domain/shared/exceptions/exception-custom';
 
-export abstract class PresignedWompiMapper {
+export abstract class PresignedGatewayMapper {
   static toDomainList(presignedDto: GetPresignedResponseDto): Presigned[] {
     const presignedAcceptance = presignedDto.data.presigned_acceptance;
     const presignedPersonalDataAuth =

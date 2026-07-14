@@ -8,19 +8,20 @@ import * as crypto from 'crypto';
 import { PostCreateTransactionRequestDto } from '../dtos/post-create-transaction-request.dto';
 import {
   PostCreateTransactionResponseDto,
-  WompiTransactionStatus,
+  GatewayTransactionStatus,
 } from '../dtos/post-create-transaction-response.dto';
 import { PaymentResult } from '@domain/transaction/model/payment-result.model';
-import { WompiStatusMyStatusMapper } from '../mappers/wompi-status-my-status.mapper';
-import { GetWompiTransactionResponseDto } from '../dtos/get-wompi-transaction-response.dto';
+import { GatewayStatusMapper } from '../mappers/gateway-status.mapper';
+import { GetGatewayTransactionResponseDto } from '../dtos/get-gateway-transaction-response.dto';
 import { HttpService } from '@nestjs/axios';
 import { AxiosRequestConfig } from 'axios';
 import { firstValueFrom } from 'rxjs';
 import { LoggerService } from '@config/logger.service';
+import { GatewayErrorMapper } from '../mappers/gateway-error.mapper';
 
-export class PaymentWompiRepository implements IPaymentGatewayRepository {
-  private readonly logger = new LoggerService(PaymentWompiRepository.name);
-  constructor(private readonly wompiService: HttpService) {}
+export class PaymentGatewayRepository implements IPaymentGatewayRepository {
+  private readonly logger = new LoggerService(PaymentGatewayRepository.name);
+  constructor(private readonly paymentGatewayService: HttpService) {}
 
   private readonly projectKey = 'SnakyDev';
 
@@ -38,7 +39,7 @@ export class PaymentWompiRepository implements IPaymentGatewayRepository {
     });
     this.logger.log('Tokenized card', { tokenizedCard });
     const amountInCents = transaction.total! * 100;
-    const signature = `${this.projectKey}-${transaction.id}${amountInCents}COP${envConstants.wompi.integrityKey}`;
+    const signature = `${this.projectKey}-${transaction.id}${amountInCents}COP${envConstants.paymentGateway.integrityKey}`;
     const encryptedSignature = crypto
       .createHash('sha256')
       .update(signature)
@@ -74,18 +75,18 @@ export class PaymentWompiRepository implements IPaymentGatewayRepository {
     );
     this.logger.log('Creation result', { creationResult });
 
-    if (creationResult.data.status !== WompiTransactionStatus.PENDING) {
+    if (creationResult.data.status !== GatewayTransactionStatus.PENDING) {
       this.logger.log('Transaction not pending', { creationResult });
       return {
         id: creationResult.data.id,
-        status: WompiStatusMyStatusMapper.map(creationResult.data.status),
+        status: GatewayStatusMapper.map(creationResult.data.status),
       };
     }
     let retries = 5;
-    let transactionStatus = WompiTransactionStatus.PENDING;
+    let transactionStatus = GatewayTransactionStatus.PENDING;
     while (
       retries > 0 &&
-      transactionStatus === WompiTransactionStatus.PENDING
+      transactionStatus === GatewayTransactionStatus.PENDING
     ) {
       this.logger.log('Getting transaction status', {
         transactionId: creationResult.data.id,
@@ -97,49 +98,67 @@ export class PaymentWompiRepository implements IPaymentGatewayRepository {
         transactionStatusResponse,
       });
       transactionStatus = transactionStatusResponse.data
-        .status as WompiTransactionStatus;
+        .status as GatewayTransactionStatus;
       retries--;
       await new Promise((resolve) => setTimeout(resolve, 1000));
     }
 
     return {
       id: creationResult.data.id,
-      status: WompiStatusMyStatusMapper.map(transactionStatus),
+      status: GatewayStatusMapper.map(transactionStatus),
     };
   }
 
   private async getTransaction(
     transactionId: string,
-  ): Promise<GetWompiTransactionResponseDto> {
+  ): Promise<GetGatewayTransactionResponseDto> {
     const request: AxiosRequestConfig = {
       method: 'GET',
       url: `/v1/transactions/${transactionId}`,
     };
     this.logger.log('Getting transaction', { request });
-    const { data } = await firstValueFrom(
-      this.wompiService.request<GetWompiTransactionResponseDto>(request),
-    );
-    this.logger.log('Transaction data', { data });
-    return data;
+    try {
+      const { data } = await firstValueFrom(
+        this.paymentGatewayService.request<GetGatewayTransactionResponseDto>(
+          request,
+        ),
+      );
+      this.logger.log('Transaction data', { data });
+      return data;
+    } catch (error) {
+      this.logger.error('Error getting transaction', {
+        error: error as Error,
+      });
+      throw GatewayErrorMapper.fromUnknown(error);
+    }
   }
 
   private async createTransaction(
-    wompiRequest: PostCreateTransactionRequestDto,
+    gatewayRequest: PostCreateTransactionRequestDto,
   ): Promise<PostCreateTransactionResponseDto> {
     const request: AxiosRequestConfig = {
       method: 'POST',
       url: '/v1/transactions',
-      data: wompiRequest,
+      data: gatewayRequest,
       headers: {
-        Authorization: `Bearer ${envConstants.wompi.privateKey}`,
+        Authorization: `Bearer ${envConstants.paymentGateway.privateKey}`,
       },
     };
     this.logger.log('Creating transaction', { request });
-    const { data } = await firstValueFrom(
-      this.wompiService.request<PostCreateTransactionResponseDto>(request),
-    );
-    this.logger.log('Transaction data', { data });
-    return data;
+    try {
+      const { data } = await firstValueFrom(
+        this.paymentGatewayService.request<PostCreateTransactionResponseDto>(
+          request,
+        ),
+      );
+      this.logger.log('Transaction data', { data });
+      return data;
+    } catch (error) {
+      this.logger.error('Error creating transaction', {
+        error: error as Error,
+      });
+      throw GatewayErrorMapper.fromUnknown(error);
+    }
   }
   private async tokenizeCard(
     paymentCard: PostCardTokenizedRequestDto,
@@ -150,10 +169,17 @@ export class PaymentWompiRepository implements IPaymentGatewayRepository {
       url: '/v1/tokens/cards',
       data: paymentCard,
     };
-    const { data } = await firstValueFrom(
-      this.wompiService.request<PostCardTokenizedResponseDto>(request),
-    );
-    this.logger.log('Tokenized card data', { data });
-    return data;
+    try {
+      const { data } = await firstValueFrom(
+        this.paymentGatewayService.request<PostCardTokenizedResponseDto>(
+          request,
+        ),
+      );
+      this.logger.log('Tokenized card data', { data });
+      return data;
+    } catch (error) {
+      this.logger.error('Error tokenizing card', { error: error as Error });
+      throw GatewayErrorMapper.fromUnknown(error);
+    }
   }
 }

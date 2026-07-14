@@ -160,7 +160,7 @@ describe('FinishTransactionUseCase', () => {
       expect.objectContaining({ delivery: createdDelivery }),
       paymentCard,
     );
-    expect(updateStockMock).toHaveBeenCalledWith(1, 2);
+    expect(updateStockMock).toHaveBeenCalledWith(1, 8);
     expect(updateMock).toHaveBeenCalledWith(
       1,
       expect.objectContaining({

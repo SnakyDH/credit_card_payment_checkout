@@ -1,14 +1,14 @@
 import { Module } from '@nestjs/common';
-import { PaymentWompiRepository } from '../adapter/out/wompi/repository/payment-wompi.repository';
+import { PaymentGatewayRepository } from '../adapter/out/payment-gateway/repository/payment-gateway.repository';
 import { HttpModule, HttpService } from '@nestjs/axios';
 import { envConstants } from '@config/env-constants';
 
 @Module({
   imports: [
     HttpModule.register({
-      baseURL: envConstants.wompi.baseUrl,
+      baseURL: envConstants.paymentGateway.baseUrl,
       headers: {
-        Authorization: `Bearer ${envConstants.wompi.publicKey}`,
+        Authorization: `Bearer ${envConstants.paymentGateway.publicKey}`,
       },
     }),
   ],
@@ -16,7 +16,7 @@ import { envConstants } from '@config/env-constants';
     {
       provide: 'IPaymentGatewayRepository',
       useFactory: (httpService: HttpService) =>
-        new PaymentWompiRepository(httpService),
+        new PaymentGatewayRepository(httpService),
       inject: [HttpService],
     },
   ],

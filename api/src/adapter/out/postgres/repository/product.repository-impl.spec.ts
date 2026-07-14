@@ -110,4 +110,23 @@ describe('ProductRepositoryImpl', () => {
     expect(result.page).toBe(1);
     expect(result.limit).toBe(10);
   });
+
+  it('should find all products with stock filters', async () => {
+    typeOrmRepository.findAndCount.mockResolvedValue([[productEntity], 1]);
+
+    await repository.findAll(2, 5, {
+      minStock: 1,
+      maxStock: 20,
+    });
+
+    const findOptions = typeOrmRepository.findAndCount.mock.calls[0]?.[0];
+    const whereClause = findOptions?.where;
+
+    expect(findOptions?.skip).toBe(5);
+    expect(findOptions?.take).toBe(5);
+    if (!whereClause || Array.isArray(whereClause)) {
+      throw new Error('Expected a single where clause object');
+    }
+    expect(whereClause.stock).toEqual(Between(1, 20));
+  });
 });

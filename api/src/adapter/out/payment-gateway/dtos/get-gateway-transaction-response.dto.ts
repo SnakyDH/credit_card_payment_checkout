@@ -1,4 +1,4 @@
-export class GetWompiTransactionResponseDto {
+export class GetGatewayTransactionResponseDto {
   data: {
     id: string;
     created_at: string;
@@ -34,7 +34,7 @@ export class GetWompiTransactionResponseDto {
     };
     status: string;
     status_message: string | null;
-    billing_data: any | null;
+    billing_data: unknown | null;
     shipping_address: {
       address_line_1: string;
       country: string;
