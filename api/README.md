@@ -1,98 +1,190 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Backend API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+NestJS + TypeScript credit card payment API with hexagonal architecture, Postgres, and external payment gateway integration.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Requirements
 
-## Description
+- Node.js 20+
+- Docker (for Postgres)
+- Payment gateway sandbox credentials
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
-
-## Project setup
+## Setup
 
 ```bash
-$ npm install
+npm install
+cp .env.example .env
 ```
 
-## Compile and run the project
+Fill `.env` with database and payment gateway credentials:
+
+```
+DB_HOST=localhost
+DB_PORT=5432
+DB_USERNAME=postgres
+DB_PASSWORD=postgres
+DB_DATABASE=products-api
+
+PAYMENT_GATEWAY_API_URL=
+PAYMENT_GATEWAY_PUBLIC_KEY=
+PAYMENT_GATEWAY_PRIVATE_KEY=
+PAYMENT_GATEWAY_EVENTS_KEY=
+PAYMENT_GATEWAY_INTEGRITY_KEY=
+```
+
+## Run with Docker
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+docker compose up --build
 ```
 
-## Run tests
+This starts Postgres and the API on port 3000.
+
+## Run locally
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+docker compose up -d postgres
+npm run migration:run
+npm run seed:dev
+npm run start:dev
 ```
 
-## Deployment
+- API base URL: `http://localhost:3000/api`
+- Swagger docs: `http://localhost:3000/docs`
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+## Tests
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+npm test
+npm run test:cov
+npm run test:e2e
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+### Coverage results
 
-## Resources
+{ coverage screenshot}
 
-Check out a few resources that may come in handy when working with NestJS:
+## API endpoints
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/products` | List products with filters/pagination |
+| GET | `/api/presigned` | Get acceptance documents |
+| POST | `/api/transactions/init-transaction` | Create pending transaction |
+| POST | `/api/transactions/finish-transaction` | Process payment |
+| GET | `/api/transactions/approved-transaction-by-id/:id` | Get transaction by ID |
 
-## Support
+## Architecture
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+Hexagonal (ports and adapters) architecture. The `domain` layer holds business
+logic and repository interfaces (ports); `src/adapter` provides the inbound
+(HTTP) and outbound (Postgres, payment gateway, Unsplash) adapters.
 
-## Stay in touch
+```mermaid
+flowchart LR
+  subgraph inbound [Inbound adapters]
+    controllers["Controllers + Handlers<br/>src/adapter/in"]
+  end
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+  subgraph core [Domain core]
+    useCases["Use cases<br/>domain/**/use_case"]
+    ports["Repository interfaces<br/>(ports)"]
+    useCases --> ports
+  end
 
-## License
+  subgraph outbound [Outbound adapters]
+    postgres["Postgres (TypeORM)<br/>src/adapter/out/postgres"]
+    gateway["Payment gateway<br/>src/adapter/out/payment-gateway"]
+    unsplash["Unsplash<br/>product generator"]
+  end
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+  controllers --> useCases
+  ports --> postgres
+  ports --> gateway
+  ports --> unsplash
+  postgres --> db[("PostgreSQL")]
+  gateway --> ext["Payment Gateway API"]
+  unsplash --> img["Unsplash API"]
+```
+
+Folder layout:
+
+```
+api/
+├── domain/           # Use cases, models, repository interfaces (ports)
+└── src/
+    ├── adapter/
+    │   ├── in/       # Controllers, handlers, DTOs
+    │   └── out/      # Postgres, payment-gateway, Unsplash adapters
+    ├── modules/      # NestJS DI wiring
+    └── config/       # Database and env configuration
+```
+
+## Docker production image
+
+```bash
+docker build -t payment-checkout-api .
+docker run -p 3000:3000 --env-file .env payment-checkout-api
+```
+
+## Deploy to AWS (demo)
+
+Architecture: Elastic Beanstalk (Docker, single-instance `t3.micro`) + RDS PostgreSQL (`db.t4g.micro`).
+
+**Prerequisites:** AWS CLI, EB CLI (`pip install awsebcli`), Docker, `aws configure`.
+
+```bash
+# Full deploy (RDS + migrations + EB + env vars + verify)
+bash scripts/aws-deploy.sh all
+
+# Or step by step:
+bash scripts/aws-deploy.sh rds      # Create RDS
+bash scripts/aws-deploy.sh migrate  # Run migrations from local
+bash scripts/aws-deploy.sh eb       # Create EB environment
+bash scripts/aws-deploy.sh env-vars # Set environment properties
+bash scripts/aws-deploy.sh sg       # Allow EB -> RDS on port 5432
+bash scripts/aws-deploy.sh deploy   # Deploy Docker image
+bash scripts/aws-deploy.sh verify   # Health check
+```
+
+**Live endpoints:**
+- API: `http://payment-checkout-api-dev.eba-bpgvahsh.us-east-1.elasticbeanstalk.com/api`
+- Swagger: `http://payment-checkout-api-dev.eba-bpgvahsh.us-east-1.elasticbeanstalk.com/docs`
+
+**Notes:**
+- RDS database name must be alphanumeric (`productsapi`, not `products-api`).
+- Set `DB_SSL=true` for RDS connections.
+- Product seed runs automatically on API startup via `SeedProductsHandler`.
+- Estimated cost: ~$30-40/month (us-east-1).
+
+## Scripts
+
+| Script | Description |
+|--------|-------------|
+| `npm run start:dev` | Start with hot reload |
+| `npm run build` | Compile TypeScript |
+| `npm run start:prod` | Run compiled app |
+| `npm test` | Unit tests |
+| `npm run test:cov` | Coverage report |
+| `npm run migration:run` | Apply DB migrations |
+| `npm run seed:dev` | Seed initial products |
+
+## Documentation
+
+- Interactive API docs (Swagger UI): `/docs` (e.g. `http://localhost:3000/docs`)
+- [Root project README](../README.md) — system architecture overview
+- [Mobile app README](../app/README.md)
+
+### Frameworks & services
+
+- [NestJS](https://docs.nestjs.com/) — modules, providers, dependency injection
+- [TypeORM](https://typeorm.io/) — entities, migrations, data source
+- [Swagger / OpenAPI (`@nestjs/swagger`)](https://docs.nestjs.com/openapi/introduction)
+- [class-validator](https://github.com/typestack/class-validator) — DTO validation
+- [Wompi payment gateway](https://docs.wompi.co/) — sandbox tokenization & transactions
+- [Unsplash API](https://unsplash.com/documentation) — product catalog images
+
+### Deployment
+
+- [AWS Elastic Beanstalk (Docker)](https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/docker.html)
+- [EB CLI reference](https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/eb-cli3.html)
+- [Amazon RDS for PostgreSQL](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_PostgreSQL.html)

@@ -13,6 +13,9 @@ export const typeOrmConfig: DataSourceOptions = {
   migrations: [path.join(__dirname, '../db/*.ts')],
   synchronize: false,
   logging: true,
+  ...(process.env.DB_SSL === 'true'
+    ? { ssl: { rejectUnauthorized: false } }
+    : {}),
 };
 
 const appDataSource = new DataSource(typeOrmConfig);

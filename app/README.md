@@ -2,6 +2,33 @@
 
 Expo React Native coffee checkout app with Redux, encrypted transaction persistence, and full payment flow.
 
+## Architecture
+
+The UI is built with `expo-router` screens. State lives in a Redux store that is
+persisted (encrypted) via `redux-persist` + `expo-secure-store`. A thin API layer
+talks to the backend using `EXPO_PUBLIC_API_URL`.
+
+```mermaid
+flowchart TB
+  subgraph ui [UI layer]
+    screens["Screens / navigation<br/>(expo-router)"]
+  end
+
+  subgraph state [State layer]
+    store["Redux store<br/>(slices)"]
+    persist["redux-persist<br/>+ expo-secure-store"]
+    store --> persist
+  end
+
+  subgraph data [Data layer]
+    apiClient["API client<br/>(EXPO_PUBLIC_API_URL)"]
+  end
+
+  screens --> store
+  screens --> apiClient
+  apiClient -->|"REST /api"| backend["NestJS API"]
+```
+
 ## Requirements
 
 - Node.js 24+
@@ -88,3 +115,17 @@ Output: `android/app/build/outputs/apk/release/app-release.apk`
 | `npm test`         | Run Jest unit tests            |
 | `npm run test:cov` | Run tests with coverage report |
 | `npm run lint`     | Run ESLint                     |
+
+## Documentation
+
+- [Root project README](../README.md) — system architecture overview
+- [Backend API README](../api/README.md) — endpoints consumed by this app
+
+### Frameworks & tools
+
+- [Expo (v57)](https://docs.expo.dev/versions/v57.0.0/) — versioned SDK docs
+- [expo-router](https://docs.expo.dev/router/introduction/) — file-based navigation
+- [React Native](https://reactnative.dev/docs/getting-started)
+- [Redux Toolkit](https://redux-toolkit.js.org/) · [redux-persist](https://github.com/rt2zz/redux-persist)
+- [expo-secure-store](https://docs.expo.dev/versions/latest/sdk/securestore/) — encrypted persistence
+- [EAS Build](https://docs.expo.dev/build/introduction/) — cloud builds (see `eas.json`)
