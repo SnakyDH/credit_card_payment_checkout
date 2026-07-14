@@ -1,0 +1,14 @@
+node_modules
+dist
+coverage
+data
+.git
+.elasticbeanstalk
+.ebextensions
+*.md
+test
+.env
+.env.*
+!.env.example
+docker-compose.yml
+scripts

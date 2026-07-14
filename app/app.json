@@ -1,0 +1,44 @@
+{
+  "expo": {
+    "name": "Café Checkout",
+    "slug": "app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon/app-icon.png",
+    "scheme": "app",
+    "userInterfaceStyle": "automatic",
+    "ios": {
+      "icon": "./assets/icon/app-icon.png"
+    },
+    "android": {
+      "icon": "./assets/icon/app-icon.png",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icon/app-icon.png",
+        "backgroundColor": "#f5caa2"
+      },
+      "predictiveBackGestureEnabled": false,
+      "package": "com.anonymous.app"
+    },
+    "web": {
+      "output": "static",
+      "favicon": "./assets/icon/app-icon.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#f5caa2",
+          "image": "./assets/icon/app-icon.png",
+          "imageWidth": 220,
+          "resizeMode": "contain"
+        }
+      ],
+      "expo-secure-store"
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": true
+    }
+  }
+}
