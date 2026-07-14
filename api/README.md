@@ -59,9 +59,9 @@ npm run test:cov
 npm run test:e2e
 ```
 
-### Coverage results
+### Coverage results:
 
-{ coverage screenshot}
+![API test coverage](../screenshots/api-test-cov.png)
 
 ## API endpoints
 

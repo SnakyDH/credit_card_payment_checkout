@@ -53,6 +53,21 @@ sequenceDiagram
   A-->>U: transaction result
 ```
 
+## Mobile app screenshots
+
+| Screen           | Description                                | Screenshot                                              |
+| ---------------- | ------------------------------------------ | ------------------------------------------------------- |
+| Home             | Product catalog with search and pagination | ![Home](screenshots/app/home-1.png)                     |
+| Home (search)    | Filtered product list                      | ![Home search](screenshots/app/home-2.png)              |
+| Home (sort)      | Sorted product list                        | ![Home sort](screenshots/app/home-3.png)                |
+| Product detail   | Coffee details and checkout entry          | ![Product detail](screenshots/app/detail.png)           |
+| Presigned        | Document acceptance before payment         | ![Presigned](screenshots/app/presigned.png)             |
+| Payment form     | Credit card input and validation           | ![Payment form](screenshots/app/form.png)               |
+| Payment summary  | Order review before confirming             | ![Payment summary](screenshots/app/payment-summary.png) |
+| Payment pending  | Transaction processing state               | ![Payment pending](screenshots/app/pay-pending.png)     |
+| Payment approved | Successful transaction                     | ![Payment approved](screenshots/app/pay-approved.png)   |
+| Payment rejected | Failed transaction                         | ![Payment rejected](screenshots/app/pay-rejected.png)   |
+
 ## Quick start
 
 ### 1. Backend API
@@ -89,7 +104,7 @@ npm test
 npm run test:cov
 ```
 
-{ADD COVERAGE REPORT HERE}
+![Mobile test coverage](screenshots/app-test-cov.png)
 
 ### Backend (`api/`)
 
@@ -99,7 +114,8 @@ npm test
 npm run test:cov
 ```
 
-{ADD COVERAGE REPORT HERE}
+
+![API test coverage](screenshots/api-test-cov.png)
 
 ## Docker (full stack)
 

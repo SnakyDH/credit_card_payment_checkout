@@ -75,14 +75,11 @@ npm run test:cov
 
 ### Coverage results
 
-| Metric     | Coverage |
-| ---------- | -------- |
-| Statements | 97.83%   |
-| Branches   | 84.21%   |
-| Functions  | 100%     |
-| Lines      | 97.79%   |
 
-Coverage is scoped to business logic in `src/modules`, `src/store`, and `src/formatters`.
+
+18 test suites, 74 tests passed. Coverage is scoped to business logic in `src/modules`, `src/store`, and `src/formatters`.
+
+![Mobile test coverage](../screenshots/app-test-cov.png)
 
 ## Features
 
@@ -92,6 +89,21 @@ Coverage is scoped to business logic in `src/modules`, `src/store`, and `src/for
 - Encrypted transaction persistence via `expo-secure-store` + `redux-persist`
 - Dedicated transaction status screen at `/transaction/status`
 - Responsive layout with `MaxContentWidth` (800px) for tablets/desktop web
+
+## Screenshots
+
+| Screen | Description | Screenshot |
+| ------ | ----------- | ---------- |
+| Home | Product catalog with search and pagination | ![Home](../screenshots/app/home-1.png) |
+| Home (search) | Filtered product list | ![Home search](../screenshots/app/home-2.png) |
+| Home (sort) | Sorted product list | ![Home sort](../screenshots/app/home-3.png) |
+| Product detail | Coffee details and checkout entry | ![Product detail](../screenshots/app/detail.png) |
+| Presigned | Document acceptance before payment | ![Presigned](../screenshots/app/presigned.png) |
+| Payment form | Credit card input and validation | ![Payment form](../screenshots/app/form.png) |
+| Payment summary | Order review before confirming | ![Payment summary](../screenshots/app/payment-summary.png) |
+| Payment pending | Transaction processing state | ![Payment pending](../screenshots/app/pay-pending.png) |
+| Payment approved | Successful transaction | ![Payment approved](../screenshots/app/pay-approved.png) |
+| Payment rejected | Failed transaction | ![Payment rejected](../screenshots/app/pay-rejected.png) |
 
 ## Build APK
 
