@@ -3,51 +3,56 @@
  * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
  */
 
-import '@/global.css';
+import "@/global.css";
 
-import { Platform } from 'react-native';
+import { Platform } from "react-native";
 
-export const Colors = {
-  light: {
-    text: '#000000',
-    background: '#ffffff',
-    backgroundElement: '#F0F0F3',
-    backgroundSelected: '#E0E1E6',
-    textSecondary: '#60646C',
-  },
-  dark: {
-    text: '#ffffff',
-    background: '#000000',
-    backgroundElement: '#212225',
-    backgroundSelected: '#2E3135',
-    textSecondary: '#B0B4BA',
-  },
+export const CoffeePalette = {
+  black: "#000000",
+  forest: "#173F2B", // Verde principal
+  forestDark: "#0D281C", // Botones, textos oscuros
+  sage: "#73806A", // Iconos y elementos secundarios
+  cream: "#F5EFE5", // Fondo principal
+  warmWhite: "#FFF9F1", // Tarjetas
+  beige: "#DED2C1", // Bordes y fondos secundarios
+  caramel: "#B9783E", // Acentos relacionados con café
+  gold: "#C69A59", // Detalles destacados
+  coffee: "#5A3824", // Elementos marrones
+  charcoal: "#242822", // Texto principal
+  mutedText: "#777369", // Texto secundario
+  // Semantic aliases (legacy starter template keys)
+  velvet: "#7F2A3C",
+  background: "#F5EFE5",
+  backgroundElement: "#DED2C1",
+  backgroundSelected: "#DED2C1",
+  text: "#242822",
+  textSecondary: "#777369",
 } as const;
 
-export type ThemeColor = keyof typeof Colors.light & keyof typeof Colors.dark;
+export type ThemeColor = keyof typeof CoffeePalette;
 
 export const Fonts = Platform.select({
   ios: {
     /** iOS `UIFontDescriptorSystemDesignDefault` */
-    sans: 'system-ui',
+    sans: "system-ui",
     /** iOS `UIFontDescriptorSystemDesignSerif` */
-    serif: 'ui-serif',
+    serif: "ui-serif",
     /** iOS `UIFontDescriptorSystemDesignRounded` */
-    rounded: 'ui-rounded',
+    rounded: "ui-rounded",
     /** iOS `UIFontDescriptorSystemDesignMonospaced` */
-    mono: 'ui-monospace',
+    mono: "ui-monospace",
   },
   default: {
-    sans: 'normal',
-    serif: 'serif',
-    rounded: 'normal',
-    mono: 'monospace',
+    sans: "normal",
+    serif: "serif",
+    rounded: "normal",
+    mono: "monospace",
   },
   web: {
-    sans: 'var(--font-display)',
-    serif: 'var(--font-serif)',
-    rounded: 'var(--font-rounded)',
-    mono: 'var(--font-mono)',
+    sans: "var(--font-display)",
+    serif: "var(--font-serif)",
+    rounded: "var(--font-rounded)",
+    mono: "var(--font-mono)",
   },
 });
 
